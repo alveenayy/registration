@@ -13,9 +13,9 @@ body {
     padding: 0;
     background: #fff0f5; /* soft pink background */
     color: #333;
-    /* Ensure body is full height and includes padding/borders in size */
+    min-height: 100vh; 
     box-sizing: border-box; 
-    min-height: 100vh;
+   
 }
 
 h1, h2, h3 {
@@ -61,14 +61,14 @@ main {
 }
 #countries-list-container h2 {
     margin-bottom: 20px;
-    font-size: 1.3em;
+    font-size: 1.2em; 
     color: #ff6f91;
 }
 #countries-list {
     list-style: none;
     padding: 0;
     flex-grow: 1;
-    overflow-y: auto; /* Allow scrolling inside the list container */
+    overflow-y: auto; 
     max-height: 650px;
     overflow-x: hidden;
 }
@@ -107,7 +107,7 @@ main {
     padding: 0 5px;
     line-height: 1;
     transition: color 0.2s;
-    flex-shrink: 0; /* Prevents button from shrinking */
+    flex-shrink: 0;
 }
 .delete-country-btn:hover {
     color: #c9003c;
@@ -128,18 +128,17 @@ main {
     margin-bottom: 12px;
     color: #ff6f91;
 }
-/* Ensure form inputs take 100% of the container width and include padding/border in that 100% */
 #clone-section input, 
 #clone-section button,
 #country-details-form input,
 .type-content input {
     width: 100%; 
-    padding: 12px 14px;
-    margin-bottom: 12px;
+    padding: 10px 14px; 
+    margin-bottom: 10px; 
     border-radius: 15px;
     border: 1px solid #ffb6c1;
     font-size: 0.95em;
-    box-sizing: border-box; /* CRITICAL for size integrity */
+    box-sizing: border-box; 
 }
 #clone-section button {
     background-color: #ff92b0;
@@ -167,7 +166,7 @@ main {
     margin-bottom: 20px;
 }
 #country-details-form {
-    text-align: center; /* Helps center any remaining non-100% elements */
+    text-align: center; 
 }
 #country-details-form label {
     display: block;
@@ -176,7 +175,7 @@ main {
     text-align: left; 
 }
 #country-details-form input {
-    margin-bottom: 18px; 
+    margin-bottom: 15px; 
 }
 
 .save-btn {
@@ -195,6 +194,14 @@ main {
 }
 
 /* ================== VISA CATEGORY & TYPE ================== */
+/* Target the immediate wrapper of the category content/header if available, 
+   or apply margin to the content panel */
+
+.category-wrapper {
+    /* If you wrap each category in a div with this class, use this for bottom margin */
+    margin-bottom: 20px; 
+}
+
 .category-header, .type-header {
     display: flex;
     justify-content: space-between;
@@ -207,6 +214,8 @@ main {
     cursor: pointer;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     transition: all 0.3s;
+    /* REDUCED FONT SIZE */
+    font-size: 0.9em; 
 }
 .category-header {
     background-color: #ffb6c1;
@@ -220,7 +229,8 @@ main {
     flex-grow: 1;
     border: none;
     background: none;
-    font-size: 1em;
+    /* REDUCED FONT SIZE */
+    font-size: 0.9em; 
     font-weight: bold;
 }
 .rename-btn {
@@ -239,13 +249,23 @@ main {
 }
 
 /* ========== CONTENT PANEL ========== */
-.category-content, .type-content {
+.category-content {
+    /* Adding bottom margin to the content panel creates space between categories */
+    margin-bottom: 20px;
     padding: 18px 20px;
     border-radius: 0 0 15px 15px;
     border-top: none;
     background-color: #fff0f5;
-    margin-bottom: 15px;
 }
+
+.type-content {
+    padding: 18px 20px;
+    border-radius: 0 0 15px 15px;
+    border-top: none;
+    background-color: #fff0f5;
+    /* Removed redundant margin-bottom here as it's handled by .category-content */
+}
+
 .type-content form {
     background-color: #ffe4ec;
     padding: 18px;
@@ -279,61 +299,93 @@ main {
     border-radius: 10px;
 }
 
-/* ================== RESPONSIVENESS (MEDIA QUERY) - AGGRESSIVE FIX ================== */
+/* ================== RESPONSIVENESS (MEDIA QUERY) - FINAL FIXES ================== */
 @media (max-width: 600px) {
     
-    /* CRITICAL FIX: Disable all horizontal and vertical scrolling on the viewport */
+    /* CRITICAL FIXES: Overflow and Sizing */
     body {
         overflow: hidden !important; 
-        padding-bottom: 0 !important; /* Prevents space from scrolling */
     }
 
-    /* Main Layout: No side margin/padding on main wrapper */
+    /* Main Layout: Uses the full screen width with small margins added to the inner panels */
     main {
         grid-template-columns: 1fr; 
-        gap: 15px; 
-        margin: 10px 0; /* Vertical margin only */
+        gap: 10px; 
+        margin: 10px 0; 
         padding: 0; 
-        overflow-y: auto; /* Re-enable internal scrolling for the main content area */
-        height: calc(100vh - 20px); /* Fill the screen height minus the main vertical margin */
+        overflow-y: auto; 
+        height: calc(100vh - 20px); 
+        padding: 0 5px; 
     }
     
-    /* Header: Full width header, slight padding */
+    /* Header: Full width header */
     header {
-        padding: 15px 10px;
+        padding: 10px 5px; 
         border-radius: 0; 
     }
 
-    /* Country List Container: Tighter padding, margin keeps it off the edge */
+    /* Country List Container: Tighter padding and explicit margins */
     #countries-list-container {
-        padding: 15px; 
+        padding: 10px; 
         border-radius: 10px;
-        margin: 0 10px; /* Add a small side margin for visual separation */
+        margin: 0 5px; 
     }
     
-    /* Data Editor Container: Tighter padding, margin keeps it off the edge */
+    /* Data Editor Container: Tighter padding and explicit margins */
     #data-editor-container {
-        padding: 15px; 
+        padding: 10px; 
         border-radius: 10px;
-        margin: 0 10px 10px 10px; /* Bottom margin for spacing */
+        margin: 0 5px 5px 5px; 
     }
     
-    /* Input Styling: Uniform padding and border-radius. 
-       Inputs now use 100% of the space defined by the container's 15px padding.
-    */
+    /* Panel Content: Reduced internal padding for compactness */
+    .category-header, .type-header {
+        padding: 8px 10px; 
+        border-radius: 8px;
+        /* REDUCED FONT SIZE FOR MOBILE */
+        font-size: 0.85em; 
+    }
+    
+    .name-input {
+        /* REDUCED FONT SIZE FOR MOBILE */
+        font-size: 0.85em;
+    }
+    
+    .category-content {
+        /* Bottom margin for separation on mobile */
+        margin-bottom: 15px; 
+        padding: 10px;
+        border-radius: 0 0 8px 8px;
+    }
+    .type-content {
+        padding: 10px;
+        border-radius: 0 0 8px 8px;
+    }
+    .type-content form {
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    /* Input Styling: Reduced vertical padding for compactness */
     #clone-section input, 
     #country-details-form input,
     .type-content input {
-        padding: 10px 15px; 
+        padding: 8px 12px; 
+        border-radius: 10px;
+        margin-bottom: 8px;
+    }
+    
+    /* Button Styling: Reduced padding for compactness */
+    .save-btn {
+        padding: 10px 15px;
         border-radius: 10px;
     }
     
     /* Country List: Smaller mobile height, forced scroll */
     #countries-list {
-        max-height: 300px;
+        max-height: 250px;
     }
 }
-
     </style>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
