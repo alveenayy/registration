@@ -1,105 +1,902 @@
-<?php 
-session_start(); 
-// Redirect if not logged in
-if (!isset($_SESSION['email'])) { 
-    header("Location: login.php"); 
-    exit(); 
-} 
-?> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visa Data Editor (Admin)</title>
+    
+    <style>
+/* ================== BASE ================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #fff0f5; /* soft pink background */
+    color: #333;
+    /* Ensure body is full height and includes padding/borders in size */
+    box-sizing: border-box; 
+    min-height: 100vh;
+}
 
-<!DOCTYPE html> 
-<html lang="en"> 
-<head> 
-    <link rel="stylesheet" href="../css/dashboard.css"> 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"> 
-    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/295/295128.png"> 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script> 
-    <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Dashboard</title> 
-</head> 
+h1, h2, h3 {
+    margin: 0;
+    font-weight: 600;
+}
 
-<body> 
-    <nav class="navbar navbar-expand-sm navbar-light bg-success"> 
-        <div class="container"> 
-            <a class="navbar-brand" href="#" style="font-weight:bold; color:white;">Dashboard</a> 
-            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" 
-                data-bs-target="#collapsibleNavId" aria-controls="collapsibleNavId" aria-expanded="false" 
-                aria-label="Toggle navigation"> 
-                <span class="navbar-toggler-icon"></span> 
-            </button> 
-            <div class="collapse navbar-collapse" id="collapsibleNavId"> 
-                <ul class="navbar-nav m-auto mt-2 mt-lg-0"></ul> 
-                <form class="d-flex my-2 my-lg-0"> 
-                    <a href="./logout.php" class="btn btn-light my-2 my-sm-0" 
-                      type="submit" style="font-weight:bolder;color:green;"> 
-                        Logout</a> 
-                </form> 
-            </div> 
-        </div> 
-    </nav> 
+/* ================== HEADER ================== */
+header {
+    background: linear-gradient(135deg, #ffc1e3, #ffb6c1);
+    color: #333;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+header p {
+    font-weight: 400;
+    margin-top: 8px;
+}
 
-    <div class="container mt-5"> 
-        <h2 class="mb-4">Welcome To Dashboard</h2> 
-        <h4 class="mb-3">Admission Form</h4> 
+/* ================== MAIN LAYOUT (DEFAULT - DESKTOP) ================== */
+main {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 30px;
+    max-width: 1500px;
+    margin: 40px auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
 
-        <form action="submit_admission.php" method="POST" enctype="multipart/form-data"> 
-            <table class="table table-bordered"> 
-                <tr> 
-                    <th>Full Name</th> 
-                    <td><input type="text" name="full_name" class="form-control" required></td> 
-                </tr> 
-                <tr> 
-                    <th>Email</th> 
-                    <td><input type="email" name="email" class="form-control" required></td> 
-                </tr> 
-                <tr> 
-                    <th>Phone</th> 
-                    <td><input type="text" name="phone" class="form-control" required></td> 
-                </tr> 
-                <tr> 
-                    <th>Gender</th> 
-                    <td> 
-                        <select name="gender" class="form-control" required> 
-                            <option value="">Select Gender</option> 
-                            <option value="Male">Male</option> 
-                            <option value="Female">Female</option> 
-                            <option value="Other">Other</option> 
-                        </select> 
-                    </td> 
-                </tr> 
-                <tr> 
-                    <th>Date of Birth</th> 
-                    <td><input type="date" name="dob" class="form-control" required></td> 
-                </tr> 
-                <tr> 
-                    <th>Address</th> 
-                    <td><textarea name="address" class="form-control" rows="3" required></textarea></td> 
-                </tr> 
-                <tr> 
-                    <th>Course</th> 
-                    <td> 
-                        <select name="course" class="form-control" required> 
-                            <option value="">Select Course</option> 
-                            <option value="Computer Science">Computer Science</option> 
-                            <option value="Business Administration">Business Administration</option> 
-                            <option value="Engineering">Engineering</option> 
-                            <option value="Arts">Arts</option> 
-                        </select> 
-                    </td> 
-                </tr> 
-                <tr> 
-                    <th>Upload Document</th> 
-                    <td><input type="file" name="document" class="form-control" required></td> 
-                </tr> 
-                <tr> 
-                    <td colspan="2" class="text-center"> 
-                        <button type="submit" class="btn btn-success">Submit Application</button> 
-                    </td> 
-                </tr> 
-            </table> 
-        </form> 
-    </div> 
-</body> 
+/* ================== COUNTRY LIST PANEL ================== */
+#countries-list-container {
+    background-color: #ffe4ec;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    min-height: 700px; 
+}
+#countries-list-container h2 {
+    margin-bottom: 20px;
+    font-size: 1.3em;
+    color: #ff6f91;
+}
+#countries-list {
+    list-style: none;
+    padding: 0;
+    flex-grow: 1;
+    overflow-y: auto; /* Allow scrolling inside the list container */
+    max-height: 650px;
+    overflow-x: hidden;
+}
+#countries-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border-radius: 15px;
+    transition: all 0.3s;
+    font-weight: 500;
+    background-color: #ffd6e8;
+}
+#countries-list li:hover, #countries-list li.active {
+    background-color: #ffabc1;
+    font-weight: 600;
+}
+#countries-list li span {
+    flex-grow: 1; 
+    min-width: 0; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ========== DELETE BUTTON STYLE ========== */
+.delete-country-btn {
+    background: none;
+    border: none;
+    color: #ff6f91;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-left: 15px;
+    padding: 0 5px;
+    line-height: 1;
+    transition: color 0.2s;
+    flex-shrink: 0; /* Prevents button from shrinking */
+}
+.delete-country-btn:hover {
+    color: #c9003c;
+    transform: scale(1.1);
+}
+#countries-list li span {
+    cursor: pointer;
+}
+
+/* ========== CLONE COUNTRY & INPUTS (Unified Styling) ========== */
+#clone-section {
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #ffb6c1;
+}
+#clone-section h3 {
+    font-size: 1em;
+    margin-bottom: 12px;
+    color: #ff6f91;
+}
+/* Ensure form inputs take 100% of the container width and include padding/border in that 100% */
+#clone-section input, 
+#clone-section button,
+#country-details-form input,
+.type-content input {
+    width: 100%; 
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border-radius: 15px;
+    border: 1px solid #ffb6c1;
+    font-size: 0.95em;
+    box-sizing: border-box; /* CRITICAL for size integrity */
+}
+#clone-section button {
+    background-color: #ff92b0;
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+#clone-section button:hover {
+    background-color: #ff6f91;
+}
+
+/* ================== DATA EDITOR PANEL ================== */
+#data-editor-container {
+    background-color: #fff0f5;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+#data-editor-container h2 {
+    color: #ff4d94;
+    margin-bottom: 20px;
+}
+#country-details-form {
+    text-align: center; /* Helps center any remaining non-100% elements */
+}
+#country-details-form label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 500;
+    text-align: left; 
+}
+#country-details-form input {
+    margin-bottom: 18px; 
+}
+
+.save-btn {
+    background-color: #ff92b0;
+    color: #fff;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin-bottom: 30px;
+}
+.save-btn:hover {
+    background-color: #ff6f91;
+}
+
+/* ================== VISA CATEGORY & TYPE ================== */
+.category-header, .type-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-radius: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+}
+.category-header {
+    background-color: #ffb6c1;
+    border: 1px solid #ff92b0;
+}
+.type-header {
+    background-color: #ffcce6;
+    border: 1px solid #ff99c8;
+}
+.name-input {
+    flex-grow: 1;
+    border: none;
+    background: none;
+    font-size: 1em;
+    font-weight: bold;
+}
+.rename-btn {
+    background-color: #ff92b0;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+.rename-btn:hover {
+    background-color: #ff6f91;
+}
+
+/* ========== CONTENT PANEL ========== */
+.category-content, .type-content {
+    padding: 18px 20px;
+    border-radius: 0 0 15px 15px;
+    border-top: none;
+    background-color: #fff0f5;
+    margin-bottom: 15px;
+}
+.type-content form {
+    background-color: #ffe4ec;
+    padding: 18px;
+    border-radius: 15px;
+    margin-bottom: 12px;
+}
+.type-content label {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.95em;
+}
+.type-content .save-btn {
+    background-color: #ff92b0;
+    color: #fff;
+    margin-top: 12px;
+}
+.type-content .save-btn:hover {
+    background-color: #ff6f91;
+}
+
+/* ================== SCROLLBAR STYLING ================== */
+#countries-list::-webkit-scrollbar {
+    width: 8px;
+}
+#countries-list::-webkit-scrollbar-thumb {
+    background-color: #ff92b0;
+    border-radius: 10px;
+}
+#countries-list::-webkit-scrollbar-track {
+    background: #ffe4ec;
+    border-radius: 10px;
+}
+
+/* ================== RESPONSIVENESS (MEDIA QUERY) - AGGRESSIVE FIX ================== */
+@media (max-width: 600px) {
+    
+    /* CRITICAL FIX: Disable all horizontal and vertical scrolling on the viewport */
+    body {
+        overflow: hidden !important; 
+        padding-bottom: 0 !important; /* Prevents space from scrolling */
+    }
+
+    /* Main Layout: No side margin/padding on main wrapper */
+    main {
+        grid-template-columns: 1fr; 
+        gap: 15px; 
+        margin: 10px 0; /* Vertical margin only */
+        padding: 0; 
+        overflow-y: auto; /* Re-enable internal scrolling for the main content area */
+        height: calc(100vh - 20px); /* Fill the screen height minus the main vertical margin */
+    }
+    
+    /* Header: Full width header, slight padding */
+    header {
+        padding: 15px 10px;
+        border-radius: 0; 
+    }
+
+    /* Country List Container: Tighter padding, margin keeps it off the edge */
+    #countries-list-container {
+        padding: 15px; 
+        border-radius: 10px;
+        margin: 0 10px; /* Add a small side margin for visual separation */
+    }
+    
+    /* Data Editor Container: Tighter padding, margin keeps it off the edge */
+    #data-editor-container {
+        padding: 15px; 
+        border-radius: 10px;
+        margin: 0 10px 10px 10px; /* Bottom margin for spacing */
+    }
+    
+    /* Input Styling: Uniform padding and border-radius. 
+       Inputs now use 100% of the space defined by the container's 15px padding.
+    */
+    #clone-section input, 
+    #country-details-form input,
+    .type-content input {
+        padding: 10px 15px; 
+        border-radius: 10px;
+    }
+    
+    /* Country List: Smaller mobile height, forced scroll */
+    #countries-list {
+        max-height: 300px;
+    }
+}
+
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>🇵🇰 Visa Data Editor (RTDB)</h1>
+        <p>Real-time content management for countries, categories, and visa details.</p>
+    </header>
+
+    <main>
+        <div id="countries-list-container">
+            <h2>🌍 Select Country</h2>
+            <ul id="countries-list"></ul>
+            
+            <div id="clone-section">
+                <h3>+ Add new country</h3>
+                <input type="text" id="new-country-id" placeholder="Enter NEW Country ID (e.g., japan)">
+                <button onclick="cloneCountry('country_1')">Clone Structure & Add</button>
+            </div>
+        </div>
+
+        <div id="data-editor-container" style="display: none;">
+            <h2 id="current-country-name"></h2>
+            
+            <div id="country-data-section">
+                <h3>Country General Data</h3>
+                <label for="country-id-input">Country ID (Key):</label>
+                <input type="text" id="country-id-input" onblur="renameCountry(currentCountryId, this.value)" style="font-weight: bold;">
+                <label for="country-name-input">Display Name:</label>
+                <input type="text" id="country-name-input" name="country_name">
+                
+                <form id="country-details-form" data-country-id="">
+                    </form>
+            </div>
+            
+            <div id="visa-categories-section">
+                <h3>Visa Categories</h3>
+                <div id="visa-categories-accordion">
+                    </div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        // --- 1. FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAN-kOCMuIQ3Y8mHPrVnEd1GT1GVQVD1uU",
+            authDomain: "datacollection-c4e28.firebaseapp.com",
+            databaseURL: "https://datacollection-c4e28-default-rtdb.firebaseio.com",
+            projectId: "datacollection-c4e28",
+            storageBucket: "datacollection-c4e28.firebasestorage.app",
+            messagingSenderId: "165965749086",
+            appId: "1:165965749086:web:74e2f49a3d868c75eb4dcf",
+            measurementId: "G-BBHJ8MHK61"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+        let currentCountryId = null;
+
+        // --- 2. CORE FUNCTIONS ---
+
+        function loadCountriesList() {
+            const listElement = document.getElementById('countries-list');
+            
+            database.ref('countries').on('value', (snapshot) => {
+                listElement.innerHTML = ''; 
+                
+                snapshot.forEach((childSnapshot) => {
+                    const countryId = childSnapshot.key;
+                    
+                    // --- START MODIFICATION ---
+                    // Hide the template country 'country_1' from the list
+                    if (countryId === 'country_1') {
+                        return; // Skip rendering this item
+                    }
+                    // --- END MODIFICATION ---
+
+                    const country = childSnapshot.val();
+                    
+                    const listItem = document.createElement('li');
+                    listItem.setAttribute('data-id', countryId);
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = country.country_name || countryId; 
+                    nameSpan.onclick = () => selectCountry(countryId, country.country_name || countryId);
+
+                    // Add Delete Button (Cross)
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-country-btn';
+                    deleteBtn.innerHTML = '✖'; // Cross symbol
+                    deleteBtn.title = `Delete ${country.country_name || countryId}`;
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation(); // Prevent country selection when deleting
+                        deleteCountry(countryId, country.country_name || countryId);
+                    };
+
+                    listItem.appendChild(nameSpan);
+                    listItem.appendChild(deleteBtn);
+                    
+                    if (currentCountryId === countryId) {
+                        listItem.classList.add('active');
+                    }
+                    listElement.appendChild(listItem);
+                });
+            }, (error) => {
+                console.error("Error loading countries:", error);
+            });
+        }
+
+        /**
+         * Deletes a country entry from the Firebase Realtime Database.
+         */
+        function deleteCountry(countryId, countryName) {
+            if (countryId === 'country_1') {
+                alert("The template country 'country_1' cannot be deleted.");
+                return;
+            }
+
+            if (confirm(`Are you sure you want to permanently delete the country: ${countryName} (${countryId})? This action cannot be undone.`)) {
+                database.ref('countries/' + countryId).remove()
+                    .then(() => {
+                        alert(`Country '${countryName}' deleted successfully.`);
+                        console.log(`Country '${countryId}' deleted.`);
+                        
+                        // Clear editor if the deleted country was the one being edited
+                        if (currentCountryId === countryId) {
+                            currentCountryId = null;
+                            document.getElementById('data-editor-container').style.display = 'none';
+                            document.getElementById('countries-list').innerHTML = ''; // Force reload via Firebase listener
+                        }
+                    })
+                    .catch(error => {
+                        alert("Error deleting country: " + error.message);
+                        console.error("Deletion error:", error);
+                    });
+            }
+        }
+        
+        // **CLONE COUNTRY** - Uses 'country_1' as the template source
+        function cloneCountry(templateId) {
+            const newIdInput = document.getElementById('new-country-id');
+            let newId = newIdInput.value.trim().toLowerCase().replace(/ /g, '_');
+
+            if (!newId || newId === templateId) {
+                alert("Please enter a valid, unique new Country ID.");
+                return;
+            }
+
+            // 1. Fetch template data (one-time read)
+            database.ref('countries/' + templateId).once('value')
+                .then(snapshot => {
+                    const templateData = snapshot.val();
+
+                    if (!templateData) {
+                        alert(`Template country '${templateId}' not found!`);
+                        return;
+                    }
+
+                    // 2. Clear all data fields in the cloned structure but preserve names
+                    const newCountryData = clearDataFromTemplate(templateData, newId);
+
+                    // 3. Save the new country
+                    return database.ref('countries/' + newId).set(newCountryData);
+                })
+                .then(() => {
+                    alert(`Country structure '${newId}' cloned successfully from '${templateId}'. Data fields are blank.`);
+                    newIdInput.value = ''; 
+                    selectCountry(newId, newId); 
+                })
+                .catch(error => {
+                    alert("Error cloning country: " + error.message);
+                    console.error("Cloning error:", error);
+                });
+        }
+        
+        /**
+         * Recursively traverses the template data and clears all simple data values (string/number)
+         * to an empty string, while preserving object structure keys, and importantly,
+         * preserving `category_name` and `type_name` values.
+         * @param {object} data - The data object to clear.
+         * @param {string} newId - The ID of the new country.
+         * @returns {object} The cleaned data structure.
+         */
+        function clearDataFromTemplate(data, newId) {
+            // Base case: replace simple value (string/number) with empty string
+            if (typeof data !== 'object' || data === null) {
+                return ''; 
+            }
+
+            const cleanedData = {};
+            for (const key in data) {
+                if (!data.hasOwnProperty(key)) continue;
+
+                if (key === 'country_name') {
+                    // Set the display name based on the new ID
+                    cleanedData[key] = newId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                } else if (key === 'last_verified') {
+                    // Set the Last Verified Date to today's date
+                    cleanedData[key] = new Date().toISOString().substring(0, 10);
+                } else if (key === 'category_name' || key === 'type_name') {
+                    // CRITICAL: Preserve the structure names
+                    cleanedData[key] = data[key];
+                } else if (typeof data[key] === 'object' && data[key] !== null) {
+                    // Recursively process nested object structures (categories, types, details)
+                    cleanedData[key] = clearDataFromTemplate(data[key], newId);
+                } else {
+                    // Clear all remaining data fields (e.g., currency_info, rejection_rate, source_link)
+                    cleanedData[key] = '';
+                }
+            }
+            return cleanedData;
+        }
+
+
+        function selectCountry(countryId, countryName) {
+            document.querySelectorAll('#countries-list li').forEach(li => li.classList.remove('active'));
+            const activeLi = document.querySelector(`li[data-id="${countryId}"]`);
+            if (activeLi) activeLi.classList.add('active');
+
+            currentCountryId = countryId;
+            document.getElementById('current-country-name').textContent = `Editing: ${countryName}`;
+            document.getElementById('data-editor-container').style.display = 'block';
+
+            document.getElementById('country-id-input').value = countryId;
+            document.getElementById('country-name-input').value = countryName;
+
+            loadCountryDetails(countryId);
+            loadVisaCategories(countryId);
+        }
+
+        function renameCountry(oldId, newId) {
+            newId = newId.trim().toLowerCase().replace(/ /g, '_');
+            
+            // --- START MODIFICATION ---
+            // Prevent renaming country_1 or renaming to country_1
+            if (!newId || oldId === newId || oldId === 'country_1' || newId === 'country_1') {
+                document.getElementById('country-id-input').value = oldId; // Revert input display
+                if (oldId === 'country_1') {
+                    alert("The template country 'country_1' cannot be renamed.");
+                } else if (newId === 'country_1') {
+                    alert("Cannot rename a country to the template ID 'country_1'.");
+                }
+                return;
+            }
+            // --- END MODIFICATION ---
+
+            database.ref('countries').child(oldId).once('value').then(snap => {
+                const data = snap.val();
+                if (!data) return;
+
+                const updates = {};
+                updates[newId] = data;
+                updates[oldId] = null; 
+
+                database.ref('countries').update(updates)
+                    .then(() => {
+                        console.log(`Country ID renamed from ${oldId} to ${newId}`);
+                        currentCountryId = newId; 
+                        selectCountry(newId, data.country_name || newId);
+                    })
+                    .catch(error => console.error("Error renaming country ID:", error));
+            });
+        }
+        
+        // --- 3. COUNTRY DETAILS (Level 1) ---
+
+        function loadCountryDetails(countryId) {
+            const form = document.getElementById('country-details-form');
+            form.setAttribute('data-country-id', countryId);
+            
+            database.ref(`countries/${countryId}`).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    renderCountryForm(data, form, countryId);
+                    document.getElementById('country-name-input').value = data.country_name || countryId; 
+                } else {
+                    form.innerHTML = `<p>Country details not found at path: countries/${countryId}.</p>`;
+                }
+            });
+        }
+
+        function renderCountryForm(data, form, countryId) {
+            form.innerHTML = '';
+            
+            // Keys to ignore at the top level, as they are nested or handled separately
+            const ignoreKeys = ['country_name', 'visa_categories'];
+
+            for (const key in data) {
+                if (typeof data[key] === 'object' && data[key] !== null) continue;
+                if (ignoreKeys.includes(key)) continue; 
+                
+                const label = document.createElement('label');
+                label.textContent = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) + ":";
+                label.setAttribute('for', key);
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = key;
+                input.name = key;
+                input.value = data[key] || ''; 
+                
+                form.appendChild(label);
+                form.appendChild(input);
+            }
+            
+            const saveBtn = document.createElement('button');
+            saveBtn.type = 'submit';
+            saveBtn.className = 'save-btn';
+            saveBtn.textContent = 'Save Country Details';
+            form.appendChild(saveBtn);
+            
+            form.onsubmit = (e) => saveCountryDetails(e, countryId, form);
+        }
+
+        function saveCountryDetails(e, countryId, form) {
+            e.preventDefault();
+            
+            const updates = {};
+            const countryName = document.getElementById('country-name-input').value.trim();
+            updates['country_name'] = countryName; 
+            
+            for (const element of form.elements) {
+                if (element.name) {
+                    updates[element.name] = element.value;
+                }
+            }
+            
+            database.ref(`countries/${countryId}`).update(updates)
+                .then(() => console.log("Country details saved successfully!"))
+                .catch(error => console.error("Error updating country details:", error));
+        }
+
+
+        // --- 4. VISA CATEGORIES & TYPES (Nested Data with Editability) ---
+
+        function loadVisaCategories(countryId) {
+            const container = document.getElementById('visa-categories-accordion');
+            
+            database.ref(`countries/${countryId}/visa_categories`).on('value', (snapshot) => {
+                container.innerHTML = ''; 
+                
+                snapshot.forEach((catChild) => {
+                    const categoryId = catChild.key;
+                    const category = catChild.val();
+
+                    renderVisaCategory(countryId, categoryId, category.category_name || categoryId, container);
+                });
+            }, (error) => console.error("Error loading visa categories:", error));
+        }
+
+        function renderVisaCategory(countryId, categoryId, categoryName, parentElement) {
+            const header = document.createElement('div');
+            header.className = 'category-header';
+            
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.className = 'name-input';
+            nameInput.value = categoryName;
+            
+            const renameBtn = document.createElement('button');
+            renameBtn.className = 'rename-btn';
+            renameBtn.textContent = 'Rename';
+            renameBtn.onclick = (e) => {
+                e.stopPropagation(); 
+                const newId = nameInput.value.trim().toLowerCase().replace(/ /g, '_');
+                renameCategory(countryId, categoryId, newId, nameInput.value.trim());
+            };
+            
+            header.appendChild(nameInput);
+            header.appendChild(renameBtn);
+
+
+            const content = document.createElement('div');
+            content.id = `content-${categoryId}`;
+            content.className = 'category-content';
+            content.style.display = 'none'; 
+            content.innerHTML = '<p>Loading types...</p>';
+            
+            header.onclick = () => {
+                if (content.style.display === 'block') {
+                    content.style.display = 'none';
+                } else {
+                    content.style.display = 'block';
+                    loadVisaTypes(countryId, categoryId, content);
+                }
+            };
+
+            parentElement.appendChild(header);
+            parentElement.appendChild(content);
+        }
+
+        function renameCategory(countryId, oldId, newId, newName) {
+             if (!newId || oldId === newId) return;
+
+             database.ref(`countries/${countryId}/visa_categories/${oldId}`).once('value').then(snap => {
+                 const data = snap.val();
+                 if (!data) return;
+
+                 const updates = {};
+                 data.category_name = newName;
+                 updates[newId] = data;
+                 updates[oldId] = null; 
+
+                 database.ref(`countries/${countryId}/visa_categories`).update(updates)
+                     .then(() => console.log(`Category ID renamed from ${oldId} to ${newId}`))
+                     .catch(error => console.error("Error renaming category ID:", error));
+             });
+        }
+
+
+        function loadVisaTypes(countryId, categoryId, parentElement) {
+            parentElement.innerHTML = '';
+
+            database.ref(`countries/${countryId}/visa_categories/${categoryId}/visa_types`).on('value', (snapshot) => {
+                parentElement.innerHTML = ''; 
+
+                snapshot.forEach((typeChild) => {
+                    const typeId = typeChild.key;
+                    const type = typeChild.val();
+                    renderVisaType(countryId, categoryId, typeId, type.type_name || typeId, parentElement);
+                });
+            }, (error) => console.error("Error loading visa types:", error));
+        }
+
+        function renderVisaType(countryId, categoryId, typeId, typeName, parentElement) {
+            const header = document.createElement('div');
+            header.className = 'type-header';
+            
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.className = 'name-input';
+            nameInput.value = 'Type: ' + typeName; 
+            
+            const renameBtn = document.createElement('button');
+            renameBtn.className = 'rename-btn';
+            renameBtn.textContent = 'Rename';
+            renameBtn.onclick = (e) => {
+                e.stopPropagation(); 
+                const newName = nameInput.value.trim().replace(/^Type:\s*/i, '');
+                const newId = newName.toLowerCase().replace(/ /g, '_');
+                renameType(countryId, categoryId, typeId, newId, newName);
+            };
+
+            header.appendChild(nameInput);
+            header.appendChild(renameBtn);
+
+            const content = document.createElement('div');
+            content.id = `content-${categoryId}-${typeId}`;
+            content.className = 'type-content';
+            content.style.display = 'none';
+            content.innerHTML = '<p>Loading details...</p>';
+            
+            header.onclick = () => {
+                if (content.style.display === 'block') {
+                    content.style.display = 'none';
+                } else {
+                    content.style.display = 'block';
+                    loadVisaDetails(countryId, categoryId, typeId, content);
+                }
+            };
+
+            parentElement.appendChild(header);
+            parentElement.appendChild(content);
+        }
+
+        function renameType(countryId, categoryId, oldId, newId, newName) {
+            if (!newId || oldId === newId) return;
+
+            database.ref(`countries/${countryId}/visa_categories/${categoryId}/visa_types/${oldId}`).once('value').then(snap => {
+                const data = snap.val();
+                if (!data) return;
+
+                const updates = {};
+                data.type_name = newName;
+                updates[newId] = data;
+                updates[oldId] = null; 
+
+                database.ref(`countries/${countryId}/visa_categories/${categoryId}/visa_types`).update(updates)
+                    .then(() => console.log(`Type ID renamed from ${oldId} to ${newId}`))
+                    .catch(error => console.error("Error renaming type ID:", error));
+            });
+        }
+
+
+        // --- 5. VISA DETAILS (Deepest Level - No changes needed) ---
+
+        function loadVisaDetails(countryId, categoryId, typeId, parentElement) {
+            const detailsRef = database.ref(`countries/${countryId}/visa_categories/${categoryId}/visa_types/${typeId}/visa_details`);
+            
+            detailsRef.on('value', (snapshot) => {
+                const data = snapshot.val() || {}; 
+                renderDetailsForm(data, detailsRef, parentElement);
+            }, (error) => console.error("Error loading visa details:", error));
+        }
+
+        function renderDetailsForm(data, docRef, parentElement) {
+            parentElement.innerHTML = '';
+            
+            const form = document.createElement('form');
+            form.className = 'visa-details-form';
+
+            const allKeys = [
+                "approval_probability", "difficulty_index", "rejection_rate", "interview_type", "travel_history_req", 
+                "passport_validity", "age_requirement", "bank_balance_min", "income_min", "financial_proof", 
+                "employment_proof", "sponsorship_rules", "accommodation_proof", "purpose_justification", 
+                "security_clearance", "core_identity", "forms", "financial_docs", "invitation", "insurance", 
+                "police_clearance", "academic_docs", "dummy_ticket", "cover_letter", "step_1", "step_2", 
+                "step_3", "step_4", "step_5", "official_fee", "service_fee", "medical_fee", "courier_fee", 
+                "processing_time", "fast_track", "refund_policy", "covid_rules", "quarantine_rules", 
+                "insurance_requirements", "source_link_1", "source_link_2", "source_link_3"
+            ];
+
+            allKeys.forEach(key => {
+                const label = document.createElement('label');
+                label.textContent = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) + ":";
+                label.setAttribute('for', `detail-${key}`);
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = `detail-${key}`;
+                input.name = key;
+                input.value = data[key] || ''; 
+                
+                form.appendChild(label);
+                form.appendChild(input);
+            });
+            
+            const saveBtn = document.createElement('button');
+            saveBtn.type = 'submit';
+            saveBtn.className = 'save-btn';
+            saveBtn.textContent = 'Save Visa Details';
+            form.appendChild(saveBtn);
+
+            form.onsubmit = (e) => saveVisaDetails(e, docRef, form);
+
+            parentElement.appendChild(form);
+        }
+
+        function saveVisaDetails(e, docRef, form) {
+            e.preventDefault();
+            
+            const updates = {};
+            for (const element of form.elements) {
+                if (element.name) {
+                    updates[element.name] = element.value;
+                }
+            }
+            
+            docRef.set(updates)
+                .then(() => console.log("Visa details saved successfully!"))
+                .catch(error => console.error("Error updating visa details:", error));
+        }
+
+
+        // --- 6. INITIALIZATION ---
+
+        window.onload = loadCountriesList;
+    </script>
+</body>
 </html>
