@@ -7,17 +7,17 @@
     
     <style>
 /* ================== BASE ================== */
+/* ================== BASE ================== */
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    background: #fff0f5; /* soft pink background */
+    background: #fff0f5; 
     color: #333;
     min-height: 100vh; 
     box-sizing: border-box; 
-   
+    /* Remove any global overflow: hidden here */
 }
-
 h1, h2, h3 {
     margin: 0;
     font-weight: 600;
@@ -39,12 +39,14 @@ header p {
 }
 
 /* ================== MAIN LAYOUT (DEFAULT - DESKTOP) ================== */
+/* ================== MAIN LAYOUT (DEFAULT - DESKTOP) ================== */
 main {
     display: grid;
     grid-template-columns: 350px 1fr;
     gap: 30px;
     max-width: 1500px;
-    margin: 40px auto;
+    /* Maintain the large desktop margin */
+    margin: 40px auto; 
     padding: 20px;
     box-sizing: border-box;
 }
@@ -200,6 +202,7 @@ main {
 .category-wrapper {
     /* If you wrap each category in a div with this class, use this for bottom margin */
     margin-bottom: 20px; 
+    height: fit-content;
 }
 
 .category-header, .type-header {
@@ -300,23 +303,32 @@ main {
 }
 
 /* ================== RESPONSIVENESS (MEDIA QUERY) - FINAL FIXES ================== */
+/* ================== RESPONSIVENESS (MEDIA QUERY) - MOBILE SCROLL FIX ================== */
 @media (max-width: 600px) {
     
     /* CRITICAL FIXES: Overflow and Sizing */
     body {
-        overflow: hidden !important; 
+        /* Re-enable scrolling on the body for mobile */
+        overflow-x: hidden !important; 
+        overflow-y: auto !important; 
     }
 
-    /* Main Layout: Uses the full screen width with small margins added to the inner panels */
+    /* Main Layout: Reduced top margin and removed fixed height */
     main {
         grid-template-columns: 1fr; 
         gap: 10px; 
-        margin: 10px 0; 
+        /* Tighter margin to maximize vertical space */
+        margin: 5px 0 10px 0; 
         padding: 0; 
-        overflow-y: auto; 
-        height: calc(100vh - 20px); 
+        /* Removed fixed height and overflow from MAIN */
         padding: 0 5px; 
     }
+    
+    
+    
+    /* ... rest of the mobile styles ... */
+    
+
     
     /* Header: Full width header */
     header {
@@ -330,14 +342,14 @@ main {
         border-radius: 10px;
         margin: 0 5px; 
     }
-    
-    /* Data Editor Container: Tighter padding and explicit margins */
+    /* Data Editor Container: Ensure it doesn't restrict its own height */
     #data-editor-container {
         padding: 10px; 
         border-radius: 10px;
         margin: 0 5px 5px 5px; 
+        /* Ensure it can grow as tall as needed for the content */
+        min-height: auto; 
     }
-    
     /* Panel Content: Reduced internal padding for compactness */
     .category-header, .type-header {
         padding: 8px 10px; 
@@ -355,6 +367,7 @@ main {
         /* Bottom margin for separation on mobile */
         margin-bottom: 15px; 
         padding: 10px;
+        height: fit-content;
         border-radius: 0 0 8px 8px;
     }
     .type-content {
